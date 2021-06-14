@@ -277,6 +277,69 @@ function apiAccessForCreatorUser (req, response, next) {
  * @param  {[type]}   response
  * @param  {Function} next
  */
+
+
+
+// function apiAccessForReviewerUser (req, response, next) {
+//   logger.debug({ msg: 'apiAccessForReviewerUser() called' }, req)
+//   var userId = req.get('x-authenticated-userid')
+//   var data = {}
+//   var rspObj = req.rspObj
+//   var qs = {
+//     fields: 'createdBy,collaborators'
+//   }
+//   var contentMessage = messageUtil.CONTENT
+
+//   data.contentId = req.params.contentId
+
+//   async.waterfall([
+
+//     function (CBW) {
+//       contentProvider.getContentUsingQuery(data.contentId, qs, req.headers,
+//         function (err, res) {
+//           if (err || res.responseCode !== responseCode.SUCCESS) {
+//             rspObj.errCode = res && res.params ? res.params.err : contentMessage.GET.FAILED_CODE
+//             rspObj.errMsg = res && res.params ? res.params.errmsg : contentMessage.GET.FAILED_MESSAGE
+//             rspObj.responseCode = res && res.responseCode ? res.responseCode : responseCode.SERVER_ERROR
+//             logger.error({
+//               msg: 'getting error from content provider',
+//               err: {
+//                 err,
+//                 errCode: rspObj.errCode,
+//                 errMsg: rspObj.errMsg,
+//                 responseCode: rspObj.responseCode
+//               },
+//               additionalInfo: { qs }
+//             }, req)
+//             var httpStatus = res && res.statusCode >= 100 && res.statusCode < 600 ? res.statusCode : 500
+//             return response.status(httpStatus).send(respUtil.errorResponse(rspObj))
+//           } else {
+//             CBW(null, res)
+//           }
+//         })
+//     },
+//     function (res) {
+//       if (res.result.content.createdBy === userId || lodash.includes(res.result.content.collaborators, userId)) {
+//         rspObj.errCode = reqMsg.TOKEN.INVALID_CODE
+//         rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE
+//         rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
+//         logger.error({
+//           msg: 'Unauthorized access',
+//           err: {
+//             errCode: rspObj.errCode,
+//             errMsg: rspObj.errMsg,
+//             responseCode: rspObj.responseCode
+//           }
+//         }, req)
+//         return response.status(401).send(respUtil.errorResponse(rspObj))
+//       } else {
+//         next()
+//       }
+//     }
+//   ])
+// }
+
+
 function apiAccessForReviewerUser (req, response, next) {
   logger.debug({ msg: 'apiAccessForReviewerUser() called' }, req)
   var userId = req.get('x-authenticated-userid')
@@ -316,25 +379,13 @@ function apiAccessForReviewerUser (req, response, next) {
         })
     },
     function (res) {
-      if (res.result.content.createdBy === userId || lodash.includes(res.result.content.collaborators, userId)) {
-        rspObj.errCode = reqMsg.TOKEN.INVALID_CODE
-        rspObj.errMsg = reqMsg.TOKEN.INVALID_MESSAGE
-        rspObj.responseCode = responseCode.UNAUTHORIZED_ACCESS
-        logger.error({
-          msg: 'Unauthorized access',
-          err: {
-            errCode: rspObj.errCode,
-            errMsg: rspObj.errMsg,
-            responseCode: rspObj.responseCode
-          }
-        }, req)
-        return response.status(401).send(respUtil.errorResponse(rspObj))
-      } else {
         next()
-      }
     }
   ])
 }
+
+
+
 
 /**
  * [hierarchyUpdateApiAccess - Check api access for hierarchy update
